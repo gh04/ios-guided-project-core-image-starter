@@ -1,6 +1,8 @@
 import UIKit
 import CoreImage
 import Photos
+//some filters do not work with CIFilterBuiltins
+import CoreImage.CIFilterBuiltins
 
 class PhotoFilterViewController: UIViewController {
 
@@ -13,7 +15,11 @@ class PhotoFilterViewController: UIViewController {
     
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
+        
+        let filter = CIFilter.gaussianBlur()
+        ///without CoreImage.CIFilterBuiltins
+        // let filter = CIFilter(name: "CIGaussianBlur")
+        print(filter.attributes)
 	}
     
     //MARK: - Helper Methods
@@ -22,7 +28,7 @@ class PhotoFilterViewController: UIViewController {
         //If there are parent controls, work limits. Handle those blocks gracefullyt
         guard UIImagePickerController.isSourceTypeAvailable(.photoLibrary) else {
             //In production include an alert.
-            print("The photo is not avaible.")
+            print("The photo is not available.")
             return
         }
         
@@ -42,7 +48,7 @@ class PhotoFilterViewController: UIViewController {
 	
 	@IBAction func savePhotoButtonPressed(_ sender: UIButton) {
 		// TODO: Save to photo library
-        //Adding a break point allows you to see image in the 
+        //Adding a break point allows you to see image in the
 	}
 	
 
