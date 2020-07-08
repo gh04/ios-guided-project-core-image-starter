@@ -81,9 +81,33 @@
                                                                 </connections>
                                                             </slider>
                                                         </subviews>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="382" id="om7-mz-zk7"/>
+                                                        </constraints>
+                                                    </stackView>
+                                                    <stackView opaque="NO" contentMode="scaleToFill" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="0Wm-VA-86L" userLabel="Saturation Stack View">
+                                                        <rect key="frame" x="0.0" y="121.5" width="382" height="20.5"/>
+                                                        <subviews>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" text="Blur" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TN8-HE-mVQ">
+                                                                <rect key="frame" x="0.0" y="0.0" width="30.5" height="20.5"/>
+                                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                                <nil key="textColor"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="0.0" maxValue="2" translatesAutoresizingMaskIntoConstraints="NO" id="t9o-wI-KJd" userLabel="Saturation Slider">
+                                                                <rect key="frame" x="36.5" y="0.0" width="347.5" height="21.5"/>
+                                                                <connections>
+                                                                    <action selector="blurChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="lJG-FB-rXq"/>
+                                                                    <action selector="saturationChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="dbG-F9-nyd"/>
+                                                                </connections>
+                                                            </slider>
+                                                        </subviews>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="382" id="TII-bs-sGs"/>
+                                                        </constraints>
                                                     </stackView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nbg-Oj-7Ub">
-                                                        <rect key="frame" x="0.0" y="121.5" width="382" height="60"/>
+                                                        <rect key="frame" x="0.0" y="162" width="382" height="60"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="60" id="WX5-ha-JWa"/>
                                                         </constraints>
@@ -93,7 +117,7 @@
                                                         </connections>
                                                     </button>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dn1-cb-8J9" userLabel="Spacer View">
-                                                        <rect key="frame" x="0.0" y="201.5" width="382" height="117.5"/>
+                                                        <rect key="frame" x="0.0" y="242" width="382" height="77"/>
                                                     </view>
                                                 </subviews>
                                                 <constraints>

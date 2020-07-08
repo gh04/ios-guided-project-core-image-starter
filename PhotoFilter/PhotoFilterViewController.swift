@@ -10,6 +10,7 @@ class PhotoFilterViewController: UIViewController {
 	@IBOutlet weak var contrastSlider: UISlider!
 	@IBOutlet weak var saturationSlider: UISlider!
 	@IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var blurSlider: UISlider!
 	
     var originalImage: UIImage? {
         didSet {
@@ -42,14 +43,15 @@ class PhotoFilterViewController: UIViewController {
     private let context = CIContext()
     //Since it is declared here you can use it in other places as opposed to filtering in private func
     private let colorControlsFilter = CIFilter.colorControls()
+    private let blurFilter = CIFilter.gaussianBlur()
     
 	override func viewDidLoad() {
 		super.viewDidLoad()
         
-        let filter = CIFilter.gaussianBlur()
+//        let filter = CIFilter.gaussianBlur()
         ///without CoreImage.CIFilterBuiltins
         // let filter = CIFilter(name: "CIGaussianBlur")
-        print(filter.attributes)
+//        print(filter.attributes)
         
         originalImage = imageView.image
 	}
@@ -63,11 +65,14 @@ class PhotoFilterViewController: UIViewController {
         colorControlsFilter.saturation = saturationSlider.value
         colorControlsFilter.brightness = brightnessSlider.value
         colorControlsFilter.contrast = contrastSlider.value
+        //clamping - repeating the colors to infinity so it not only blurring from the edges, making them transparent.
+        blurFilter.inputImage = colorControlsFilter.outputImage?.clampedToExtent()
+        blurFilter.radius = blurSlider.value
         
-        guard let outputImage = colorControlsFilter.outputImage else { return nil }
+        guard let outputImage = blurFilter.outputImage else { return nil }
 //        extent - the whole image
         
-        guard let renderedCGIImage = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
+        guard let renderedCGIImage = context.createCGImage(outputImage, from: inputImage.extent) else { return nil }
         //
         return UIImage(cgImage: renderedCGIImage)
         
@@ -146,6 +151,10 @@ class PhotoFilterViewController: UIViewController {
 	@IBAction func saturationChanged(_ sender: Any) {
         updateImage()
 	}
+    
+    @IBAction func blurChanged(_ sender: Any) {
+        updateImage()
+    }
 }
 
 
