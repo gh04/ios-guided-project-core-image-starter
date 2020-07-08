@@ -11,7 +11,11 @@ class PhotoFilterViewController: UIViewController {
 	@IBOutlet weak var saturationSlider: UISlider!
 	@IBOutlet weak var imageView: UIImageView!
 	
-    var originalImage: UIImage?
+    var originalImage: UIImage? {
+        didSet {
+            updateImage()
+        }
+    }
     
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -20,9 +24,19 @@ class PhotoFilterViewController: UIViewController {
         ///without CoreImage.CIFilterBuiltins
         // let filter = CIFilter(name: "CIGaussianBlur")
         print(filter.attributes)
+        
+        originalImage = imageView.image
 	}
     
     //MARK: - Helper Methods
+    
+    private func updateImage() {
+        if let originalImage = originalImage {
+            imageView.image = originalImage
+        } else {
+            imageView.image = nil
+        }
+    }
     
     private func presentImagePickerController() {
         //If there are parent controls, work limits. Handle those blocks gracefullyt
