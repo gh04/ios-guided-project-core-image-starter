@@ -106,7 +106,8 @@ class PhotoFilterViewController: UIViewController {
 	@IBAction func savePhotoButtonPressed(_ sender: UIButton) {
 		// TODO: Save to photo library
         //Adding a break point allows you to see image in the
-        guard let originalImage = originalImage, let ciImage = CIImage(image: originalImage) else { return }
+        //.flattened helper method to correctly orient a photo
+        guard let originalImage = originalImage?.flattened, let ciImage = CIImage(image: originalImage) else { return }
         
         guard let processedImage = image(byFiltering: ciImage) else { return }
         
