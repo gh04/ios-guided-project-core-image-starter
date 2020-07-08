@@ -24,13 +24,16 @@ class PhotoFilterViewController: UIViewController {
             
             scaledSize = CGSize(width: scaledSize.width*scale, height: scaledSize.height*scale)
             
-            let scaledUIImage = originalImage.imageByScaling(toSize: scaledSize)
+            guard let scaledUIImage = originalImage.imageByScaling(toSize: scaledSize) else {
+                scaledImage = nil
+                return
+            }
             
-            scaledImage = scaledUIImage
+            scaledImage = CIImage(image: scaledUIImage)
         }
     }
     
-    var scaledImage: UIImage? {
+    var scaledImage: CIImage? {
         didSet {
             updateImage()
         }
@@ -53,21 +56,20 @@ class PhotoFilterViewController: UIViewController {
     
     //MARK: - Helper Methods
     
-    private func image(byFiltering image: UIImage) -> UIImage {
-        let inputImage = CIImage(image: image)
+    private func image(byFiltering inputImage: CIImage) -> UIImage? {
+       
         
         filter.inputImage = inputImage
         filter.saturation = saturationSlider.value
         filter.brightness = brightnessSlider.value
         filter.contrast = contrastSlider.value
         
-        guard let outputImage = filter.outputImage else { return image }
-        //extent - the whole image
-        context.createCGImage(outputImage, from: outputImage.extent)
+        guard let outputImage = filter.outputImage else { return nil }
+//        extent - the whole image
         
-        guard let renderedCGImage = context.createCGImage(outputImage, from: outputImage.extent) else { return image }
+        guard let renderedCGIImage = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
         //
-        return UIImage(cgImage: renderedCGImage)
+        return UIImage(cgImage: renderedCGIImage)
         
     }
     
@@ -104,8 +106,31 @@ class PhotoFilterViewController: UIViewController {
 	@IBAction func savePhotoButtonPressed(_ sender: UIButton) {
 		// TODO: Save to photo library
         //Adding a break point allows you to see image in the
+        guard let originalImage = originalImage, let ciImage = CIImage(image: originalImage) else { return }
+        
+        guard let processedImage = image(byFiltering: ciImage) else { return }
+        
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.creationRequestForAsset(from: processedImage)
+        }) { (success, error) in
+            if let error = error {
+                print("Error saving photo: \(error)")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.presentSuccesfulSaveAlert()
+            }
+        }
 	}
 	
+    private func presentSuccesfulSaveAlert() {
+        let alert = UIAlertController(title: "Photo Saved!", message: "The photo has been saved to your Photo Library!", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        
+        present(alert, animated: true, completion: nil)
+    }
 
 	// MARK: Slider events
 	

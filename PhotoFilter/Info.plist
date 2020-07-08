@@ -44,7 +44,7 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>$(PRODUCT_NAME) needs to access to your photo library to save images.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs to access your photo library to filter images.</string>
 	<key>UIRequiredDeviceCapabilities</key>
