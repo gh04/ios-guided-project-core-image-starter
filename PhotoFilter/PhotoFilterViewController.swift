@@ -41,7 +41,7 @@ class PhotoFilterViewController: UIViewController {
     
     private let context = CIContext()
     //Since it is declared here you can use it in other places as opposed to filtering in private func
-    private let filter = CIFilter.colorControls()
+    private let colorControlsFilter = CIFilter.colorControls()
     
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -59,12 +59,12 @@ class PhotoFilterViewController: UIViewController {
     private func image(byFiltering inputImage: CIImage) -> UIImage? {
        
         
-        filter.inputImage = inputImage
-        filter.saturation = saturationSlider.value
-        filter.brightness = brightnessSlider.value
-        filter.contrast = contrastSlider.value
+        colorControlsFilter.inputImage = inputImage
+        colorControlsFilter.saturation = saturationSlider.value
+        colorControlsFilter.brightness = brightnessSlider.value
+        colorControlsFilter.contrast = contrastSlider.value
         
-        guard let outputImage = filter.outputImage else { return nil }
+        guard let outputImage = colorControlsFilter.outputImage else { return nil }
 //        extent - the whole image
         
         guard let renderedCGIImage = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
