@@ -6,6 +6,12 @@ import CoreImage.CIFilterBuiltins
 
 class PhotoFilterViewController: UIViewController {
 
+    
+    private let context = CIContext(options: nil)
+       //Since it is declared here you can use it in other places as opposed to filtering in private func
+       private let colorControlsFilter = CIFilter.colorControls()
+       private let blurFilter = CIFilter.gaussianBlur()
+    
 	@IBOutlet weak var brightnessSlider: UISlider!
 	@IBOutlet weak var contrastSlider: UISlider!
 	@IBOutlet weak var saturationSlider: UISlider!
@@ -14,19 +20,24 @@ class PhotoFilterViewController: UIViewController {
 	
     var originalImage: UIImage? {
         didSet {
+            // We want to scale down the image to make it easier to filter until the user is ready to save the image.
             updateImage()
             guard let originalImage = originalImage else {
                 scaledImage = nil
                 return
             }
-            
+            // The size of the imageView
+            // height and width of the image view
             var scaledSize = imageView.bounds.size
-            let scale = UIScreen.main.scale
+            // 1, 2, or 3
+            //resolution
+            let scale: CGFloat = UIScreen.main.scale
             
             scaledSize = CGSize(width: scaledSize.width*scale, height: scaledSize.height*scale)
             
+            // 'imageByScaling' is coming from the UIImage+scaling.swift
             guard let scaledUIImage = originalImage.imageByScaling(toSize: scaledSize) else {
-                scaledImage = nil
+//                scaledImage = nil
                 return
             }
             
@@ -40,10 +51,7 @@ class PhotoFilterViewController: UIViewController {
         }
     }
     
-    private let context = CIContext()
-    //Since it is declared here you can use it in other places as opposed to filtering in private func
-    private let colorControlsFilter = CIFilter.colorControls()
-    private let blurFilter = CIFilter.gaussianBlur()
+   
     
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -56,10 +64,13 @@ class PhotoFilterViewController: UIViewController {
         originalImage = imageView.image
 	}
     
+
+    
     //MARK: - Helper Methods
     
+
     private func image(byFiltering inputImage: CIImage) -> UIImage? {
-       
+
         
         colorControlsFilter.inputImage = inputImage
         colorControlsFilter.saturation = saturationSlider.value
@@ -68,14 +79,14 @@ class PhotoFilterViewController: UIViewController {
         //clamping - repeating the colors to infinity so it not only blurring from the edges, making them transparent.
         blurFilter.inputImage = colorControlsFilter.outputImage?.clampedToExtent()
         blurFilter.radius = blurSlider.value
-        
-        guard let outputImage = blurFilter.outputImage else { return nil }
+
+        guard let outputImage = blurFilter.outputImage else { return originalImage }
 //        extent - the whole image
-        
-        guard let renderedCGIImage = context.createCGImage(outputImage, from: inputImage.extent) else { return nil }
+//using the origianl imagel
+        guard let renderedCGIImage = context.createCGImage(outputImage, from: inputImage.extent) else { return originalImage }
         //
         return UIImage(cgImage: renderedCGIImage)
-        
+
     }
     
     private func updateImage() {
@@ -87,10 +98,11 @@ class PhotoFilterViewController: UIViewController {
     }
     
     private func presentImagePickerController() {
-        //If there are parent controls, work limits. Handle those blocks gracefullyt
+        //If there are parent controls, work limits. Handle those blocks gracefully
+        // Make sure the photo library is available to use in the first place
         guard UIImagePickerController.isSourceTypeAvailable(.photoLibrary) else {
             //In production include an alert.
-            print("The photo is not available.")
+            NSLog("The photo is not available.")
             return
         }
         
@@ -109,20 +121,22 @@ class PhotoFilterViewController: UIViewController {
 	}
 	
 	@IBAction func savePhotoButtonPressed(_ sender: UIButton) {
-		// TODO: Save to photo library
+
         //Adding a break point allows you to see image in the
         //.flattened helper method to correctly orient a photo
         guard let originalImage = originalImage?.flattened, let ciImage = CIImage(image: originalImage) else { return }
         
-        guard let processedImage = image(byFiltering: ciImage) else { return }
+        guard let filteredImage = image(byFiltering: ciImage) else { return }
         
         PHPhotoLibrary.shared().performChanges({
-            PHAssetChangeRequest.creationRequestForAsset(from: processedImage)
+            PHAssetChangeRequest.creationRequestForAsset(from: filteredImage)
         }) { (success, error) in
             if let error = error {
-                print("Error saving photo: \(error)")
+               print("Error saving photo: \(error)")
+//                NSLog("%@", error)
                 return
             }
+            //Present an alert to the user saying that the image was successfully saved
             
             DispatchQueue.main.async {
                 self.presentSuccesfulSaveAlert()
@@ -134,7 +148,7 @@ class PhotoFilterViewController: UIViewController {
         let alert = UIAlertController(title: "Photo Saved!", message: "The photo has been saved to your Photo Library!", preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        
+        //present here
         present(alert, animated: true, completion: nil)
     }
 
@@ -167,7 +181,7 @@ extension PhotoFilterViewController: UIImagePickerControllerDelegate, UINavigati
         } else if let image = info[.originalImage] as? UIImage {
             originalImage = image
         }
-        
+        //dimissing
         picker.dismiss(animated: true, completion: nil)
     }
     
